@@ -8,9 +8,15 @@ namespace MyApp
         static object previousValue = null;
         static async Task Main(string[] args)
         {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "Path");
+            NewFolder(path, "Path");
+            string uploadfilePath = Path.Combine(path, "Upload Path" );
+            string downloadfilePath = Path.Combine(path, "Download Path");
+            NewFile(uploadfilePath, "Upload Path");
+            NewFile(downloadfilePath, "Download Path");
 
-            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "Upload");
-            string downloadFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Download");
+            string folderPath = Path.Combine(ReadFileToString(uploadfilePath), "Upload");
+            string downloadFolderPath = Path.Combine(ReadFileToString(uploadfilePath), "Download");
             NewFolder(folderPath, "Upload");
             NewFolder(downloadFolderPath, "Download");
 
@@ -64,6 +70,19 @@ namespace MyApp
             //Console.WriteLine("Press enter to exit.");
             //Console.ReadLine();
         }
+        static void NewFile(string path, string name)
+        {
+            if (File.Exists(path))
+            {
+                Console.WriteLine("중복된 파일 이름이 존재합니다.");
+            }
+            else
+            {
+                // 파일 생성
+                File.WriteAllText(path, "");
+                Console.WriteLine($"{name} 파일이 생성되었습니다.");
+            }
+        }
         static void NewFolder(string path, string name)
         {
             if (!Directory.Exists(path))
@@ -98,24 +117,43 @@ namespace MyApp
                 else
                     Console.WriteLine($"Error: {response.StatusCode}");
         }
-
-        static async void OnTimerElapsed(object sender, ElapsedEventArgs e)
+        static string ReadFileToString(string filePath)
         {
-            // HTTP 요청을 사용하여 홈페이지에서 보낸 문자열 값 확인
-            //using (HttpClient client = new HttpClient())
-            //{
-            //    var response = await client.GetAsync("http://r741.realserver2.com/api/post.php");
-            //    string currentValue = await response.Content.ReadAsStringAsync();
-            //    if (previousValue != currentValue)
-            //        previousValue = currentValue;
-            //    else return;
-            //    // 현재 날짜 및 시간을 기준으로 고유한 파일 이름 생성
-            //    string fileName = "Download_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
-            //    string filePath = Path.Combine(downloadFolderPath, fileName);
+            // 파일이 존재하는지 확인
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine($"File not found: {filePath}");
+                return null;
+            }
 
-            //    File.WriteAllText(filePath, currentValue);
-            //}
+            try
+            {
+                // 파일을 읽어서 string으로 변환하여 반환
+                return File.ReadAllText(filePath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to read file: {ex.Message}");
+                return null;
+            }
         }
+        //static async void OnTimerElapsed(object sender, ElapsedEventArgs e)
+        //{
+        //    // HTTP 요청을 사용하여 홈페이지에서 보낸 문자열 값 확인
+        //    //using (HttpClient client = new HttpClient())
+        //    //{
+        //    //    var response = await client.GetAsync("http://r741.realserver2.com/api/post.php");
+        //    //    string currentValue = await response.Content.ReadAsStringAsync();
+        //    //    if (previousValue != currentValue)
+        //    //        previousValue = currentValue;
+        //    //    else return;
+        //    //    // 현재 날짜 및 시간을 기준으로 고유한 파일 이름 생성
+        //    //    string fileName = "Download_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt";
+        //    //    string filePath = Path.Combine(downloadFolderPath, fileName);
+
+        //    //    File.WriteAllText(filePath, currentValue);
+        //    //}
+        //}
 
     }
 
