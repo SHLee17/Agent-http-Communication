@@ -6,8 +6,15 @@ namespace MyApp
     internal class Program
     {
         static object previousValue = null;
+        static string logFile;
+
         static async Task Main(string[] args)
         {
+            string log = Path.Combine(Directory.GetCurrentDirectory(), "Log");
+            NewFolder(log, "LogFolder");
+            logFile = Path.Combine(log, "Log");
+            NewFile(logFile, "Log");
+
             string path = Path.Combine(Directory.GetCurrentDirectory(), "Path");
             NewFolder(path, "Path");
             string uploadfilePath = Path.Combine(path, "Upload Path" );
@@ -109,13 +116,18 @@ namespace MyApp
             // HTTP 요청을 사용하여 홈 페이지로 문자열 전송
                 var content = new StringContent(fileContents, Encoding.UTF8, "text/plain");
                 var response = await httpClient.PostAsync("http://r741.realserver2.com/api/testJSON.php", content);
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine(responseBody);
-                }
-                else
-                    Console.WriteLine($"Error: {response.StatusCode}");
+            if (response.IsSuccessStatusCode)
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+
+                File.AppendAllText(logFile, $"{DateTime.Now} - Success: {e.FullPath} - {responseBody}\n");
+                Console.WriteLine(responseBody);
+            }
+            else
+            {
+                Console.WriteLine($"Error: {response.StatusCode}");
+                File.AppendAllText(logFile, $"{DateTime.Now} - Error: {e.FullPath} - {response.StatusCode}\n");
+            }
         }
         static string ReadFileToString(string filePath)
         {
